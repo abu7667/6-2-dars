@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Les Ailes - Меню</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">LES AILES®</div>
+    <div class="address-input">
+      <input type="text" placeholder="Укажите свой адрес" />
+    </div>
+    <nav class="nav">
+      <a href="#">О нас</a>
+      <a href="#">Меню</a>
+      <a href="#">Акции</a>
+      <a href="#">Филиалы</a>
+      <a href="#">Контакты</a>
+    </nav>
+  </header>
+
+  <!-- Banner -->
+  <section class="banner">
+    <img src="https://via.placeholder.com/1200x300/FF0066/FFFFFF?text=1+1+SEZAR+BURGER+BARBEKYU+BURGER" alt="Акция 1+1" />
+  </section>
+
+  <!-- Sets Section -->
+  <section class="sets-section">
+    <h2>Сеты</h2>
+    <div class="sets-grid" id="setsGrid">
+      <!-- Mahsulotlar JS orqali qo'shiladi -->
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>2024 Все права защищены</p>
+    <div class="footer-logo">LES AILES®</div>
+  </footer>
+
+  <!-- Savatcha tugmasi -->
+  <div class="cart-button" id="cartBtn">🛒 Zakaz berish (<span id="cartCount">0</span>)</div>
+
+  <!-- Savatcha modal oynasi -->
+  <div class="modal" id="cartModal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Savatcha</h3>
+      <div id="cartItems"></div>
+      <div class="total">
+        <strong>Umumiy narx: </strong><span id="totalPrice">0</span> сум
+      </div>
+      <button id="checkoutBtn">Buyurtma berish</button>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Mahsulotlar ma'lumotlari (rasmga qarab)
+    const sets = [
+      { name: "Qiyiriq сет", price: "45 000 сум", img: "https://via.placeholder.com/200x200/FFFFFF/000000?text=Qiyiriq+set" },
+      { name: "Снек сет", price: "79 000 сум", img: "https://via.placeholder.com/200x200/FFFFFF/000000?text=Снек+сет" },
+      { name: "Классик сет", price: "34 000 сум", img: "https://via.placeholder.com/200x200/FFFFFF/000000?text=Классик+сет" },
+      { name: "Лонгер рингс сет", price: "45 000 сум", img: "https://via.placeholder.com/200x200/FFFFFF/000000?text=Лонгер+рингс+сет" },
+      { name: "Биг сет", price: "62 000 сум", img: "https://via.placeholder.com/200x200/FFFFFF/000000?text=Биг+сет" },
+      { name: "Лестер сет", price: "53 000 сум", img: "https://via.placeholder.com/200x200/FFFFFF/000000?text=Лестер+сет" },
+      { name: "Скул сет", price: "36 000 сум", img: "https://via.placeholder.com/200x200/FFFFFF/000000?text=Скул+сет" },
+      { name: "Комбо сет Большой", price: "20 000 сум", img: "https://via.placeholder.com/200x200/FFFFFF/000000?text=Комбо+сет+Большой" },
+      { name: "Do'stlar 1x", price: "43 000 сум", img: "https://via.placeholder.com/200x200/FFFFFF/000000?text=Do'stlar+1x" },
+      { name: "Do'stlar 2x", price: "79 000 сум", img: "https://via.placeholder.com/200x200/FFFFFF/000000?text=Do'stlar+2x" },
+      { name: "Do'stlar 4x", price: "149 000 сум", img: "https://via.placeholder.com/200x200/FFFFFF/000000?text=Do'stlar+4x" },
+      { name: "Острый Do'stlar 1x", price: "43 000 сум", img: "https://via.placeholder.com/200x200/FFFFFF/000000?text=Острый+Do'stlar+1x" }
+    ];
+
+    // DOM elementlari
+    const setsGrid = document.getElementById('setsGrid');
+    const cartBtn = document.getElementById('cartBtn');
+    const modal = document.getElementById('cartModal');
+    const closeBtn = document.querySelector('.close');
+    const cartItems = document.getElementById('cartItems');
+    const totalPriceEl = document.getElementById('totalPrice');
+    const cartCountEl = document.getElementById('cartCount');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+
+    // Savatcha
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    // Mahsulotlarni render qilish
+    function renderSets() {
+      setsGrid.innerHTML = sets.map(set => `
+        <div class="set-card">
+          <img src="${set.img}" alt="${set.name}" />
+          <h3>${set.name}</h3>
+          <p class="price">${set.price}</p>
+          <button class="add-btn" onclick="addToCart('${set.name}', '${set.price}')">+</button>
+        </div>
+      `).join('');
+    }
+
+    // Savatchaga qo'shish
+    window.addToCart = function(name, priceStr) {
+      const price = parseInt(priceStr.replace(/\s/g, '').replace('сум', ''));
+      cart.push({ name, price });
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+      alert(`✅ "${name}" savatchaga qo'shildi!`);
+    };
+
+    // Savatchani yangilash
+    function updateCart() {
+      cartCountEl.innerText = cart.length;
+      cartItems.innerHTML = '';
+      let total = 0;
+
+      cart.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'cart-item';
+        itemDiv.innerHTML = `
+          <span>${item.name}</span>
+          <span>${item.price.toLocaleString()} сум</span>
+        `;
+        cartItems.appendChild(itemDiv);
+        total += item.price;
+      });
+
+      totalPriceEl.innerText = total.toLocaleString();
+    }
+
+    // Modalni ochish/yopish
+    cartBtn.addEventListener('click', () => {
+      modal.style.display = 'block';
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+
+    // Buyurtma berish
+    checkoutBtn.addEventListener('click', () => {
+      if (cart.length === 0) {
+        alert("Savatchangiz bo'sh!");
+        return;
+      }
+      alert(`✅ Buyurtmangiz qabul qilindi!\nUmumiy narx: ${totalPriceEl.innerText} сум`);
+      cart = [];
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+      modal.style.display = 'none';
+    });
+
+    // Dastur ishga tushganda
+    renderSets();
+    updateCart();
+  </script>
+</body>
+</html>
